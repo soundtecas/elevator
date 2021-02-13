@@ -43,3 +43,48 @@ if len(cachedFiles) <= 0:
 
 soundtrackPath = cachedFiles[0]
 print('Ready using cached soundtrack', soundtrackPath)
+
+try:
+    import RPi.GPIO as GPIO
+    import time
+    import pygame
+
+    # Configure GPIO
+    gpioPin = 16
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setup(gpioPin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    print('Listening to signal on GPIO pin', gpioPin)
+
+    # Configure pygame mixer
+    pygame.mixer.init()
+    pygame.mixer.music.load(soundtrackPath)
+    pygame.mixer.music.set_volume(1.0)
+    max_music_play_seconds = int(config['soundtrack_play_seconds'])
+
+    while pygame.mixer.music.get_busy() == True:
+        pass
+
+    print('Awaiting signal')
+    while True:
+        signal_received = GPIO.input(gpioPin) == False
+        is_music_playing = pygame.mixer.music.get_busy()
+
+        if signal_received: # Button pressed / signal received
+            if is_music_playing == False:
+                print('Playing music')
+                pygame.mixer.music.play()
+            else:
+                print('Music is already playing')
+
+        if is_music_playing:
+            music_play_time = (pygame.mixer.music.get_pos() / 1000) % 60
+            if music_play_time >= max_music_play_seconds:
+                print('Music play time threshold reached. Stopping.')
+                pygame.mixer.music.stop()
+
+        time.sleep(0.2)
+
+except (ImportError, RuntimeError):
+    print("Not running on raspberry")
+    print("Exiting")
+

@@ -15,6 +15,8 @@ and [Beocreate 4](https://www.hifiberry.com/shop/boards/beocreate-4-channel-ampl
 ## Configuration
 * Create a `config.yaml` file (use `config.sample.yaml` as a template).
 * Set your desired values in `config.yaml`.
+* Run `pip install -r requirements.txt`
+* Create cache directory: `mkdir cache`
 
 ## Development
 **Requirements:**
@@ -40,3 +42,14 @@ $ deactivate
 
 ## Running
 With `python3` installed, run `python3 elevator.py` in your shell.
+
+## Raspberry setup
+* Ensure directory exists `/home/pi/bin`.
+* Clone repo into the `bin` folder.
+* `cd` into `/home/pi/bin/elevator`
+* Follow **Configuration** steps above.
+
+* The GPIO button should connect to `GPIO pin 16` and `GND`
+
+### Beocreate4
+* [Follow guide](https://www.hifiberry.com/beocreate/beocreate-doc/beocreate-installing-the-sigmatcpserver/)
