@@ -1,3 +1,42 @@
 # Soundtec Elevator
 
-Sound files URL: https://www.dropbox.com/sh/08dqa1pi6xkvkvn/AADRoAuqTXNfF3LKseE0xI0ma?dl=0
+On a specific GPIO input signal, it plays a cached sound file for a set amount of seconds.
+
+The cached sound file is downloaded from a shared Dropbox folder.
+Configure access to your Dropbox account in `config.yaml`.
+
+The program currently only supports `.mp3` sound files.
+
+This program is intended for [Raspberry Pi](https://www.raspberrypi.org/products/raspberry-pi-4-model-b/)
+and [Beocreate 4](https://www.hifiberry.com/shop/boards/beocreate-4-channel-amplifier/).
+
+---
+
+## Configuration
+* Create a `config.yaml` file (use `config.sample.yaml` as a template).
+* Set your desired values in `config.yaml`.
+
+## Development
+**Requirements:**
+* `python3`
+* `pip3`
+* `virtualenv`
+* [Dropbox API app](https://www.dropbox.com/developers/apps) and API key.
+
+**Create viritual enviornment:**
+```sh
+$ virtualenv <env_name> -p python3
+```
+
+**Active viritial enviornment:**
+```sh
+$ source <env_name>/bin/activate
+```
+
+To deactivate:
+```sh
+$ deactivate
+```
+
+## Running
+With `python3` installed, run `python3 elevator.py` in your shell.
