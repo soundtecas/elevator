@@ -1,0 +1,3 @@
+dropbox_access_token: '<token>'
+soundtrack_play_seconds: 30
+cache_path: './cache'
