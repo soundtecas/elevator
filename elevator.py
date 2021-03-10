@@ -85,6 +85,8 @@ try:
         time.sleep(0.2)
 
 except (ImportError, RuntimeError):
-    print("Not running on raspberry")
-    print("Exiting")
+    print('Not running on raspberry')
+    input('Press any key to trigger music:\n')
 
+    from playsound import playsound
+    playsound(soundtrackPath)
