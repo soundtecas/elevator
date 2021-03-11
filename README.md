@@ -51,5 +51,8 @@ With `python3` installed, run `python3 elevator.py` in your shell.
 
 * The GPIO button should connect to `GPIO pin 16` and `GND`
 
+To set volume on Raspberry PI: `alsamixer`
+To store the set volume: `sudo alsactl store`
+
 ### Beocreate4
 * [Follow guide](https://www.hifiberry.com/beocreate/beocreate-doc/beocreate-installing-the-sigmatcpserver/)
