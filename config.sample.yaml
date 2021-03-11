@@ -1,3 +1,5 @@
 dropbox_access_token: '<token>'
 soundtrack_play_seconds: 30
 cache_path: './cache'
+pi_signal_gpio_down: 25
+pi_signal_gpio_up: 26

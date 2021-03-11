@@ -50,10 +50,13 @@ try:
     import pygame
 
     # Configure GPIO
-    gpioPin = 16
+    # gpioPin = 16
+    pin_up = config['pi_signal_gpio_up']
+    pin_down = config['pi_signal_gpio_down']
     GPIO.setmode(GPIO.BCM)
-    GPIO.setup(gpioPin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-    print('Listening to signal on GPIO pin', gpioPin)
+    GPIO.setup(pin_up, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    GPIO.setup(pin_down, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    print('Listening to signal on GPIO pins', pin_up, pin_down)
 
     # Configure pygame mixer
     pygame.mixer.init()
@@ -66,10 +69,11 @@ try:
 
     print('Awaiting signal')
     while True:
-        signal_received = GPIO.input(gpioPin) == False
+        signal_up_received = GPIO.input(pin_up) == False
+        signal_down_received = GPIO.input(pin_down) == False
         is_music_playing = pygame.mixer.music.get_busy()
 
-        if signal_received: # Button pressed / signal received
+        if signal_up_received or signal_down_received: # Button pressed / signal received
             if is_music_playing == False:
                 print('Playing music')
                 pygame.mixer.music.play()
