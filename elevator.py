@@ -53,6 +53,8 @@ try:
     # gpioPin = 16
     pin_up = config['pi_signal_gpio_up']
     pin_down = config['pi_signal_gpio_down']
+    pin_check_interval = config['pi_signal_interval_ms']
+
     GPIO.setmode(GPIO.BCM)
     GPIO.setup(pin_up, GPIO.IN, pull_up_down=GPIO.PUD_UP)
     GPIO.setup(pin_down, GPIO.IN, pull_up_down=GPIO.PUD_UP)
@@ -86,7 +88,7 @@ try:
                 print('Music play time threshold reached. Stopping.')
                 pygame.mixer.music.stop()
 
-        time.sleep(0.2)
+        time.sleep(pin_check_interval)
 
 except (ImportError, RuntimeError):
     print('Not running on raspberry')
