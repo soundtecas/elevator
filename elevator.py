@@ -95,18 +95,20 @@ try:
 
         if signal_up_received or signal_down_received: # Button pressed / signal received
             if is_music_playing == False:
-                print('Playing music')
-                pygame.mixer.music.rewind()
-                pygame.mixer.music.play(fade_ms=fade_ms)
+                with start_transaction(op="task", name="music_play"):
+                    print('Playing music')
+                    pygame.mixer.music.rewind()
+                    pygame.mixer.music.play(fade_ms=fade_ms)
             else:
                 print('Music is already playing')
 
         if is_music_playing:
             music_play_time = (pygame.mixer.music.get_pos() / 1000) % 60
             if music_play_time >= max_music_play_seconds:
-                print('Music play time threshold reached. Stopping.')
-                pygame.mixer.music.fadeout(fade_ms)
-                pygame.mixer.music.rewind()
+                with start_transaction(op="task", name="music_stop"):
+                    print('Music play time threshold reached. Stopping.')
+                    pygame.mixer.music.fadeout(fade_ms)
+                    pygame.mixer.music.rewind()
 
         time.sleep(pin_check_interval)
 
