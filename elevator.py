@@ -86,11 +86,13 @@ try:
         signal_up_received = GPIO.input(pin_up) == False
         signal_down_received = GPIO.input(pin_down) == False
         is_music_playing = pygame.mixer.music.get_busy()
+        fade_ms = 1000
 
         if signal_up_received or signal_down_received: # Button pressed / signal received
             if is_music_playing == False:
                 print('Playing music')
-                pygame.mixer.music.play()
+                pygame.mixer.music.rewind()
+                pygame.mixer.music.play(fade_ms=fade_ms)
             else:
                 print('Music is already playing')
 
@@ -98,7 +100,8 @@ try:
             music_play_time = (pygame.mixer.music.get_pos() / 1000) % 60
             if music_play_time >= max_music_play_seconds:
                 print('Music play time threshold reached. Stopping.')
-                pygame.mixer.music.stop()
+                pygame.mixer.music.fadeout(fade_ms)
+                pygame.mixer.music.rewind()
 
         time.sleep(pin_check_interval)
 
