@@ -40,6 +40,7 @@ print('Config loaded')
 
 sentry_sdk.init(
     dsn=config['sentry'],
+    environment=config['sentry_env'],
 
     # Set traces_sample_rate to 1.0 to capture 100%
     # of transactions for performance monitoring.
