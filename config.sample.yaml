@@ -4,3 +4,4 @@ cache_path: './cache'
 pi_signal_gpio_down: 25
 pi_signal_gpio_up: 26
 pi_signal_interval_ms: 0.2
+sentry: ''

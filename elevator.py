@@ -2,6 +2,8 @@ import yaml
 import glob
 import dropbox
 import os
+import sentry_sdk
+from sentry_sdk import start_transaction
 
 def loadConfig(file):
     with open(file, 'r') as stream:
@@ -14,24 +16,34 @@ def clearCache(path):
         os.remove(f)
 
 def fetchAndCacheSoundtrack(dropboxAccessToken, path):
-    with dropbox.Dropbox(dropboxAccessToken) as dbx:
-        # List available fiels
-        files = dbx.files_list_folder(path='', include_non_downloadable_files=False)
-        if len(files.entries) <= 0:
-            raise Exception('No files found')
+    with start_transaction(op="task", name="fetchAndCacheSoundtrack"):
+        with dropbox.Dropbox(dropboxAccessToken) as dbx:
+            # List available fiels
+            files = dbx.files_list_folder(path='', include_non_downloadable_files=False)
+            if len(files.entries) <= 0:
+                raise Exception('No files found')
 
-        # Select the last file in the folder
-        fileToFetch = files.entries[-1]
-        _, res = dbx.files_download(path='/' + fileToFetch.name)
+            # Select the last file in the folder
+            fileToFetch = files.entries[-1]
+            _, res = dbx.files_download(path='/' + fileToFetch.name)
 
-        # Cache the fetched file
-        cachedFilePath = path + '/' + fileToFetch.name
-        with open(cachedFilePath, 'wb') as f:
-            f.write(res.content)
-            print('Soundtrack cached', cachedFilePath)
+            # Cache the fetched file
+            cachedFilePath = path + '/' + fileToFetch.name
+            with open(cachedFilePath, 'wb') as f:
+                f.write(res.content)
+                print('Soundtrack cached', cachedFilePath)
 
 config = loadConfig('config.yaml')
 print('Config loaded')
+
+sentry_sdk.init(
+    dsn=config['sentry'],
+
+    # Set traces_sample_rate to 1.0 to capture 100%
+    # of transactions for performance monitoring.
+    # We recommend adjusting this value in production.
+    traces_sample_rate=1.0
+)
 
 cachePath = config['cache_path']
 clearCache(cachePath)
