@@ -28,7 +28,9 @@ def fetchAndCacheSoundtrack(dropboxAccessToken, path):
             _, res = dbx.files_download(path='/' + fileToFetch.name)
 
             # Cache the fetched file
-            cachedFilePath = path + '/' + fileToFetch.name
+            _, extension = os.path.splitext(fileToFetch.name)
+            cachedFilePath = path + '/' + 'music' + extension
+
             with open(cachedFilePath, 'wb') as f:
                 f.write(res.content)
                 print('Soundtrack cached', cachedFilePath)
