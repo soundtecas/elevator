@@ -108,6 +108,8 @@ try:
                 with start_transaction(op="task", name="music_stop"):
                     print('Music play time threshold reached. Stopping.')
                     pygame.mixer.music.fadeout(fade_ms)
+                    time.sleep(fade_ms / 1000)
+                    pygame.mixer.music.stop()
                     pygame.mixer.music.rewind()
 
         time.sleep(pin_check_interval)
