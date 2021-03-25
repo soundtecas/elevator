@@ -56,3 +56,20 @@ To store the set volume: `sudo alsactl store`
 
 ### Beocreate4
 * [Follow guide](https://www.hifiberry.com/beocreate/beocreate-doc/beocreate-installing-the-sigmatcpserver/)
+
+```
+import os
+os.system('mpg321 ~/elevator/cache/music.mp3')
+``
+
+https://stackoverflow.com/questions/62585077/how-do-i-get-amixer-pcm-numid-3-to-work-on-raspberry-pi-4
+
+dsptoolkit install-profile https://raw.githubusercontent.com/hifiberry/hifiberry-dsp/master/sample_files/xml/4way-default.xml
+
+Edit volume (Se issue: https://github.com/hifiberry/hifiberry-dsp/issues/22)
+```
+crontab -e
+
+systemctl enable cron.service
+systemctl restart cron.service
+```
