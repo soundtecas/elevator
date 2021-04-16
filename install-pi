@@ -1,9 +1,22 @@
 #!/bin/sh
 
-# Create neccessary files
-mkdir cache
-cp config.sample.yaml config.yaml
-pip3 install -r requirements.txt
+cat <<EOT >dspprofile.service
+[Unit]
+Description=DSPProfile
+Before=elevator.target
+
+[Service]
+Type=idle
+User=pi
+ExecStart=/usr/local/bin/dsptoolkit install-profile /home/pi/elevator/dsp.xml && amixer sset DSPVolume 20% && alsactl store
+Restart=on-failure
+RestartSec=10
+StartLimitInterval=30
+StartLimitBurst=20
+
+[Install]
+WantedBy=multi-user.target
+EOT
 
 cat <<EOT >elevator.service
 [Unit]
@@ -25,9 +38,14 @@ StartLimitBurst=20
 WantedBy=multi-user.target
 EOT
 
+sudo cp dspprofile.service /lib/systemd/system/dspprofile.service
 sudo cp elevator.service /lib/systemd/system/elevator.service
+
 rm elevator.service
+rm dspprofile.service
 
 sudo systemctl daemon-reload
+sudo systemctl enable dspprofile.service
+sudo systemctl restart dspprofile.service
 sudo systemctl enable elevator.service
 sudo systemctl restart elevator.service
