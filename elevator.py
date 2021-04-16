@@ -4,15 +4,8 @@ import dropbox
 import os
 import sys
 import time, threading
-import logging
-from systemd.journal import JournalHandler
 import sentry_sdk
 from sentry_sdk import start_transaction
-
-log = logging.getLoggedemor('elevator')
-log.addHandler(JournalHandler())
-log.setLevel(logging.INFO)
-log.info("sent to journal")
 
 def loadConfig(file):
     with open(file, 'r') as stream:
