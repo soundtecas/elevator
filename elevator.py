@@ -96,11 +96,9 @@ def play_music(gpio_trigger):
         print("Music already playing")
         return
 
-    pygame.mixer.music.load(soundtrackPath)
-    pygame.mixer.music.rewind()
-
     print("Playing music for", max_music_play_seconds, "seconds")
-    pygame.mixer.music.play(max_music_play_seconds, fade_ms=fade_ms)
+    pygame.mixer.music.load(soundtrackPath)
+    pygame.mixer.music.play(fade_ms=fade_ms)
     threading.Timer(max_music_play_seconds, stop_music).start()
 
 GPIO.setmode(GPIO.BCM)
@@ -108,11 +106,12 @@ configureGPIPTrigger(pin_up, play_music)
 configureGPIPTrigger(pin_down, play_music)
 print('Listening to signal on GPIO pins', pin_up, pin_down)
 
-running = True
-while running:
-    time.sleep(1)
-
-print("quitting")
-pygame.quit()
-GPIO.cleanup()
-sys.exit()
+try:
+    running = True
+    while running:
+        time.sleep(1)
+except:
+    print("quitting")
+    pygame.quit()
+    GPIO.cleanup()
+    sys.exit()
