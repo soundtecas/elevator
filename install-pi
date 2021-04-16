@@ -3,17 +3,16 @@
 cat <<EOT >dspprofile.service
 [Unit]
 Description=DSPProfile
+Wants=network-online.target
 After=network-online.target
 Before=elevator.target
 
 [Service]
-Type=idle
+Type=simple
 User=pi
-ExecStart=/home/pi/volume.sh
+ExecStart=/home/pi/elevator/volume.sh
 Restart=on-failure
 RestartSec=10
-StartLimitInterval=30
-StartLimitBurst=20
 
 [Install]
 WantedBy=multi-user.target
@@ -24,6 +23,7 @@ cat <<EOT >elevator.service
 Description=Elevator
 After=network-online.target
 After=sound.target
+After=dspprofile.target
 
 [Service]
 Type=idle
