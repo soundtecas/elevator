@@ -24,7 +24,6 @@ cat <<EOT >elevator.service
 Description=Elevator
 After=network-online.target
 After=sound.target
-After=dspprofile.target
 
 [Service]
 Type=idle
