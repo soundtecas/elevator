@@ -3,6 +3,7 @@
 cat <<EOT >dspprofile.service
 [Unit]
 Description=DSPProfile
+After=network-online.target
 Before=elevator.target
 
 [Service]
