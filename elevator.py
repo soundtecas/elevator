@@ -74,12 +74,20 @@ try:
 except:
     print('No down file found')
 
-cachedFiles = glob.glob(cachePath + '/*.mp3')
-if len(cachedFiles) <= 0:
-    raise Exception('Missing cached file. Exiting program.')
 
-soundtrackPath = cachedFiles[0]
-print('Ready using cached soundtrack', soundtrackPath)
+cachedUpFiles = glob.glob(cachePath + '/up_*')
+cachedDownFiles = glob.glob(cachePath + '/down_*')
+
+music_file_up = None
+music_file_down = None
+
+if len(cachedUpFiles) > 0:
+    music_file_up = cachedUpFiles[-1]
+
+if len(cachedDownFiles) > 0:
+    music_file_down = cachedDownFiles[-1]
+
+print('Ready using cached soundtrack up/down', music_file_up, music_file_down)
 
 # Configure GPIO
 pin_up = config['pi_signal_gpio_up']
@@ -106,8 +114,14 @@ def play_music(gpio_trigger):
         print("Music already playing")
         return
 
-    print("Playing music for", max_music_play_seconds, "seconds")
-    pygame.mixer.music.load(soundtrackPath)
+    is_pin_up = gpio_trigger == pin_up
+    selected_music = (music_file_up, music_file_down)[is_pin_up]
+    if selected_music == None:
+        print('No music to play')
+        return
+    
+    print("Playing music for", max_music_play_seconds, "seconds", selected_music)
+    pygame.mixer.music.load(selected_music)
     pygame.mixer.music.play(fade_ms=fade_ms)
     threading.Timer(max_music_play_seconds, stop_music).start()
 
