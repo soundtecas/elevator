@@ -4,6 +4,9 @@ import dropbox
 import os
 import sys
 import time, threading
+import RPi.GPIO as GPIO
+import time
+import pygame
 import sentry_sdk
 from sentry_sdk import start_transaction
 
@@ -67,10 +70,6 @@ if len(cachedFiles) <= 0:
 
 soundtrackPath = cachedFiles[0]
 print('Ready using cached soundtrack', soundtrackPath)
-
-import RPi.GPIO as GPIO
-import time
-import pygame
 
 # Configure GPIO
 pin_up = config['pi_signal_gpio_up']
