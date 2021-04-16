@@ -20,22 +20,23 @@ def clearCache(path):
     for f in files:
         os.remove(f)
 
-def fetchAndCacheSoundtrack(dropboxAccessToken, path):
+def fetchAndCacheSoundtrack(dropboxAccessToken, toPath, fromPath):
     with start_transaction(op="task", name="fetchAndCacheSoundtrack"):
         with dropbox.Dropbox(dropboxAccessToken) as dbx:
             # List available fiels
-            files = dbx.files_list_folder(path='', include_non_downloadable_files=False)
+            files = dbx.files_list_folder(path='/' + fromPath, include_non_downloadable_files=False)
             if len(files.entries) <= 0:
                 raise Exception('No files found')
 
             # Select the last file in the folder
-            print(files.entries)
             fileToFetch = files.entries[-1]
-            _, res = dbx.files_download(path='/' + fileToFetch.name)
+            print(fileToFetch)
+
+            _, res = dbx.files_download(path=fileToFetch.path_lower)
 
             # Cache the fetched file
             _, extension = os.path.splitext(fileToFetch.name)
-            cachedFilePath = path + '/' + 'music' + extension
+            cachedFilePath = toPath + '/' + fromPath + '_music' + extension
 
             with open(cachedFilePath, 'wb') as f:
                 f.write(res.content)
@@ -62,7 +63,16 @@ sentry_sdk.init(
 
 cachePath = config['cache_path']
 clearCache(cachePath)
-fetchAndCacheSoundtrack(config['dropbox_access_token'], cachePath)
+
+try:
+    fetchAndCacheSoundtrack(config['dropbox_access_token'], cachePath, 'up')
+except:
+    print('No up file found')
+
+try:
+    fetchAndCacheSoundtrack(config['dropbox_access_token'], cachePath, 'down')
+except:
+    print('No down file found')
 
 cachedFiles = glob.glob(cachePath + '/*.mp3')
 if len(cachedFiles) <= 0:
