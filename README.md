@@ -73,3 +73,24 @@ crontab -e
 systemctl enable cron.service
 systemctl restart cron.service
 ```
+
+
+For Raspberry PI
+```
+python3 -m pip install -U pygame --user
+sudo apt-get install libsdl2-mixer-2.0-0 libsdl2-image-2.0-0 libsdl2-2.0-0
+```
+
+
+
+[Unit]
+Description=Elevator
+After=multi-user.target
+
+[Service]
+User=pi
+Type=idle
+ExecStart=/usr/bin/python3 /home/pi/elevator/elevator.py > /home/pi/elevator/logs.log 2>&1
+
+[Install]
+WantedBy=multi-user.target

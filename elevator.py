@@ -2,8 +2,17 @@ import yaml
 import glob
 import dropbox
 import os
+import sys
+import time, threading
+import logging
+from systemd.journal import JournalHandler
 import sentry_sdk
 from sentry_sdk import start_transaction
+
+log = logging.getLoggedemor('elevator')
+log.addHandler(JournalHandler())
+log.setLevel(logging.INFO)
+log.info("sent to journal")
 
 def loadConfig(file):
     with open(file, 'r') as stream:
@@ -24,6 +33,7 @@ def fetchAndCacheSoundtrack(dropboxAccessToken, path):
                 raise Exception('No files found')
 
             # Select the last file in the folder
+            print(files.entries)
             fileToFetch = files.entries[-1]
             _, res = dbx.files_download(path='/' + fileToFetch.name)
 
@@ -34,6 +44,10 @@ def fetchAndCacheSoundtrack(dropboxAccessToken, path):
             with open(cachedFilePath, 'wb') as f:
                 f.write(res.content)
                 print('Soundtrack cached', cachedFilePath)
+
+def configureGPIPTrigger(gpio_pin, cb):
+    GPIO.setup(gpio_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    GPIO.add_event_detect(gpio_pin, GPIO.RISING, callback=cb, bouncetime=500)
 
 config = loadConfig('config.yaml')
 print('Config loaded')
@@ -61,62 +75,52 @@ if len(cachedFiles) <= 0:
 soundtrackPath = cachedFiles[0]
 print('Ready using cached soundtrack', soundtrackPath)
 
-try:
-    import RPi.GPIO as GPIO
-    import time
-    import pygame
+import RPi.GPIO as GPIO
+import time
+import pygame
 
-    # Configure GPIO
-    # gpioPin = 16
-    pin_up = config['pi_signal_gpio_up']
-    pin_down = config['pi_signal_gpio_down']
-    pin_check_interval = config['pi_signal_interval_ms']
+# Configure GPIO
+pin_up = config['pi_signal_gpio_up']
+pin_down = config['pi_signal_gpio_down']
+pin_check_interval = config['pi_signal_interval_ms']
 
-    GPIO.setmode(GPIO.BCM)
-    GPIO.setup(pin_up, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-    GPIO.setup(pin_down, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-    print('Listening to signal on GPIO pins', pin_up, pin_down)
+# Configure pygame mixer
+pygame.mixer.init()
+pygame.mixer.music.set_volume(1.0)
 
-    # Configure pygame mixer
-    pygame.mixer.init()
+fade_ms = 1000
+max_music_play_seconds = int(config['soundtrack_play_seconds'])
+
+def stop_music():
+    print("Fading out music for", fade_ms, "ms")
+    pygame.mixer.music.fadeout(fade_ms)
+    pygame.mixer.music.unload()
+
+def play_music(gpio_trigger):
+    print("Play music for trigger", gpio_trigger)
+    
+    is_music_playing = pygame.mixer.music.get_busy()
+    if is_music_playing:
+        print("Music already playing")
+        return
+
     pygame.mixer.music.load(soundtrackPath)
-    pygame.mixer.music.set_volume(1.0)
-    max_music_play_seconds = int(config['soundtrack_play_seconds'])
+    pygame.mixer.music.rewind()
 
-    while pygame.mixer.music.get_busy() == True:
-        pass
+    print("Playing music for", max_music_play_seconds, "seconds")
+    pygame.mixer.music.play(max_music_play_seconds, fade_ms=fade_ms)
+    threading.Timer(max_music_play_seconds, stop_music).start()
 
-    print('Awaiting signal')
-    while True:
-        signal_up_received = GPIO.input(pin_up) == False
-        signal_down_received = GPIO.input(pin_down) == False
-        is_music_playing = pygame.mixer.music.get_busy()
-        fade_ms = 1000
+GPIO.setmode(GPIO.BCM)
+configureGPIPTrigger(pin_up, play_music)
+configureGPIPTrigger(pin_down, play_music)
+print('Listening to signal on GPIO pins', pin_up, pin_down)
 
-        if signal_up_received or signal_down_received: # Button pressed / signal received
-            if is_music_playing == False:
-                with start_transaction(op="task", name="music_play"):
-                    print('Playing music')
-                    pygame.mixer.music.rewind()
-                    pygame.mixer.music.play(fade_ms=fade_ms)
-            else:
-                print('Music is already playing')
+running = True
+while running:
+    time.sleep(1)
 
-        if is_music_playing:
-            music_play_time = (pygame.mixer.music.get_pos() / 1000) % 60
-            if music_play_time >= max_music_play_seconds:
-                with start_transaction(op="task", name="music_stop"):
-                    print('Music play time threshold reached. Stopping.')
-                    pygame.mixer.music.fadeout(fade_ms)
-                    time.sleep(fade_ms / 1000)
-                    pygame.mixer.music.stop()
-                    pygame.mixer.music.rewind()
-
-        time.sleep(pin_check_interval)
-
-except (ImportError, RuntimeError):
-    print('Not running on raspberry')
-    input('Press any key to trigger music:\n')
-
-    from playsound import playsound
-    playsound(soundtrackPath)
+print("quitting")
+pygame.quit()
+GPIO.cleanup()
+sys.exit()
