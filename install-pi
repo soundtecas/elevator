@@ -9,7 +9,7 @@ Before=elevator.target
 [Service]
 Type=idle
 User=pi
-ExecStart=/usr/local/bin/dsptoolkit install-profile /home/pi/elevator/dsp.xml && amixer sset DSPVolume 20% && alsactl store
+ExecStart=/home/pi/volume.sh
 Restart=on-failure
 RestartSec=10
 StartLimitInterval=30
