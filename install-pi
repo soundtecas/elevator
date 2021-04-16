@@ -7,7 +7,7 @@ After=network-online.target
 Before=elevator.target
 
 [Service]
-Type=oneshot
+Type=idle
 User=pi
 ExecStart=/usr/local/bin/dsptoolkit install-profile /home/pi/elevator/dsp.xml && amixer sset DSPVolume 20% && alsactl store
 Restart=on-failure
