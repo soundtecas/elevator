@@ -5,6 +5,7 @@ cat <<EOT >dspprofile.service
 Description=DSPProfile
 Wants=network-online.target
 After=network-online.target
+After=sound.target
 Before=elevator.target
 
 [Service]
