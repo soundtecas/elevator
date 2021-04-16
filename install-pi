@@ -1,0 +1,27 @@
+#!/bin/sh
+
+cat <<EOT >elevator.service
+[Unit]
+Description=Elevator
+After=network-online.target
+After=sound.target
+
+[Service]
+Type=idle
+User=pi
+ExecStart=/pi/home/elevator 
+Restart=always
+RestartSec=10
+StartLimitInterval=30
+StartLimitBurst=20
+
+[Install]
+WantedBy=multi-user.target
+EOT
+
+sudo cp elevator.service /lib/systemd/system/elevator.service
+rm elevator.service
+
+sudo systemctl daemon-reload
+sudo systemctl enable elevator.service
+sudo systemctl restart elevator.service
