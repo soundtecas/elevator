@@ -1,5 +1,9 @@
 #!/bin/sh
 
+# Create neccessary files
+mkdir cache
+cp config.sample.yaml config.yaml
+
 cat <<EOT >elevator.service
 [Unit]
 Description=Elevator
