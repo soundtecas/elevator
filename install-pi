@@ -3,6 +3,7 @@
 # Create neccessary files
 mkdir cache
 cp config.sample.yaml config.yaml
+pip3 install -r requirements
 
 cat <<EOT >elevator.service
 [Unit]
@@ -13,7 +14,8 @@ After=sound.target
 [Service]
 Type=idle
 User=pi
-ExecStart=/pi/home/elevator 
+WorkingDirectory=/home/pi/elevator/
+ExecStart=/usr/bin/python3 /home/pi/elevator/elevator.py
 Restart=always
 RestartSec=10
 StartLimitInterval=30
