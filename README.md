@@ -77,8 +77,8 @@ systemctl restart cron.service
 
 For Raspberry PI
 ```
+sudo apt-get update && sudo apt-get install -y git vim python-pip python3-pip python3-rpi.gpio libsdl2-mixer-2.0-0 libsdl2-image-2.0-0 libsdl2-2.0-0
 python3 -m pip install -U pygame --user
-sudo apt-get install libsdl2-mixer-2.0-0 libsdl2-image-2.0-0 libsdl2-2.0-0
 ```
 
 
